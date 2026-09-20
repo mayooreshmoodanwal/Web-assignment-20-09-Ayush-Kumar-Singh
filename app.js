@@ -19,8 +19,20 @@ const app = express();
 // Trust proxy for secure cookies behind reverse proxies (Vercel, Render, etc.)
 app.set('trust proxy', 1);
 
-// Connect to MongoDB
-connectDB();
+// Middleware to ensure DB connection before handling requests in serverless environments
+app.use(async (req, res, next) => {
+  // Skip DB connection for static assets
+  if (req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/images') || req.path === '/favicon.ico') {
+    return next();
+  }
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('[DB Connection Middleware Error]', err.message);
+    next(err);
+  }
+});
 
 // Security middleware (Helmet configured for Chart.js & Google Fonts CDN)
 app.use(
