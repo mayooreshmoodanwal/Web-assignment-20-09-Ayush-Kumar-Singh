@@ -1,0 +1,114 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Daily Attendance</h1>
+          <p class="page-subtitle">Track your gym consistency and check in daily</p>
+        </div>
+      </div>
+
+      <!-- Attendance Action Card -->
+      <div class="card" style="border-left: 4px solid <%= todayAttendance ? 'var(--accent)' : 'var(--primary)' %>;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+              Today's Status
+            </div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+              <% if (todayAttendance) { %>
+                <span style="color: var(--accent);">&#10003; Checked In</span>
+              <% } else { %>
+                <span style="color: var(--warning);">&#9679; Not Checked In Today</span>
+              <% } %>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
+              <% if (todayAttendance) { %>
+                You checked in today at <strong><%= formatTime(todayAttendance.checkInTime) %></strong>. Great job staying disciplined!
+              <% } else { %>
+                Mark your daily check-in as soon as you arrive at the gym. Each calendar day allows one check-in.
+              <% } %>
+            </p>
+          </div>
+
+          <div>
+            <% if (!todayAttendance) { %>
+              <form action="/member/attendance/mark" method="POST">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span>Mark Present Today</span>
+                </button>
+              </form>
+            <% } else { %>
+              <button class="btn btn-secondary btn-lg" disabled style="cursor: not-allowed; opacity: 0.75;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Attendance Recorded</span>
+              </button>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Statistics & History -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Attendance History</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Attendance this month: <strong><%= monthlyCount %> days</strong>
+            </p>
+          </div>
+          <span class="badge badge-active"><%= history.length %> Total Records</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Check-In Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (history && history.length > 0) { %>
+                <% history.forEach(record => { %>
+                  <tr>
+                    <td style="font-weight: 600;"><%= record.formattedDate %></td>
+                    <td><%= record.day %></td>
+                    <td><%= record.formattedTime %></td>
+                    <td><span class="badge badge-active">Present</span></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 3rem;">
+                    <div class="empty-state" style="padding: 0;">
+                      <p class="empty-state-title">No attendance records yet.</p>
+                      <p class="empty-state-desc">Click the "Mark Present Today" button above to log your first check-in.</p>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

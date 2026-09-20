@@ -1,0 +1,75 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+            <a href="/admin/membership-plans">&larr; Back to Plans</a>
+          </div>
+          <h1 class="page-title"><%= isEdit ? 'Edit Membership Plan' : 'Create Membership Plan' %></h1>
+          <p class="page-subtitle"><%= isEdit ? `Update details for "${plan.name}"` : 'Define duration, pricing, and benefits for members' %></p>
+        </div>
+      </div>
+
+      <div class="card" style="max-width: 680px;">
+        <form action="<%= isEdit ? `/admin/membership-plans/${plan._id}/edit` : '/admin/membership-plans/create' %>" method="POST">
+          <div class="form-group">
+            <label class="form-label" for="name">Plan Name *</label>
+            <input type="text" id="name" name="name" class="form-control"
+              placeholder="e.g. Monthly Standard, Annual Pro"
+              value="<%= plan ? plan.name : '' %>" required autofocus>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="durationDays">Duration (in Days) *</label>
+              <input type="number" id="durationDays" name="durationDays" class="form-control"
+                placeholder="e.g. 30, 90, 180, 365" min="1"
+                value="<%= plan ? plan.durationDays : '' %>" required>
+              <span class="form-text">e.g. 30 = 1 month, 365 = 1 year</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="price">Price (₹) *</label>
+              <input type="number" id="price" name="price" class="form-control"
+                placeholder="e.g. 1500" min="0"
+                value="<%= plan ? plan.price : '' %>" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">Plan Description</label>
+            <textarea id="description" name="description" class="form-control" rows="3"
+              placeholder="Full gym access, locker usage, free fitness assessment..."><%= plan ? plan.description : '' %></textarea>
+          </div>
+
+          <% if (isEdit) { %>
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+              <input type="checkbox" id="isActive" name="isActive" <%= plan.isActive ? 'checked' : '' %> style="width: 18px; height: 18px;">
+              <label for="isActive" style="font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                Plan is Active (Available for new member assignments)
+              </label>
+            </div>
+          <% } %>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary">
+              <%= isEdit ? 'Update Plan' : 'Save Plan' %>
+            </button>
+            <a href="/admin/membership-plans" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

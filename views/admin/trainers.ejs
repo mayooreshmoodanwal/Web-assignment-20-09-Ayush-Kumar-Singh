@@ -1,0 +1,115 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Trainer Management</h1>
+          <p class="page-subtitle">Manage certified gym trainers and their client assignments</p>
+        </div>
+        <a href="/admin/trainers/create" class="btn btn-primary">+ Add New Trainer</a>
+      </div>
+
+      <!-- Trainers Table -->
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Trainer Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Specialization</th>
+              <th>Assigned Members</th>
+              <th>Account Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (trainers && trainers.length > 0) { %>
+              <% trainers.forEach(t => { %>
+                <tr>
+                  <td>
+                    <div style="font-weight: 700; color: var(--text-primary);"><%= t.name %></div>
+                    <div style="font-size: 0.75rem; color: #64748b;">Joined <%= formatDate(t.createdAt) %></div>
+                  </td>
+                  <td><%= t.email %></td>
+                  <td><%= t.phone || '—' %></td>
+                  <td><span class="badge badge-role-trainer"><%= t.specialization || 'General Fitness' %></span></td>
+                  <td>
+                    <strong><%= t.assignedCount %></strong> members
+                  </td>
+                  <td>
+                    <span class="badge <%= t.isActive ? 'badge-active' : 'badge-expired' %>">
+                      <%= t.isActive ? 'Active' : 'Inactive' %>
+                    </span>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                      <!-- Edit Trainer Details Modal Trigger / Simple inline collapse -->
+                      <button type="button" class="btn btn-secondary btn-sm"
+                        onclick="document.getElementById('editTrainer_<%= t._id %>').style.display = document.getElementById('editTrainer_<%= t._id %>').style.display === 'none' ? 'table-row' : 'none'">
+                        Edit
+                      </button>
+
+                      <form action="/admin/trainers/<%= t._id %>/toggle-status" method="POST" style="display:inline;">
+                        <button type="button" class="btn <%= t.isActive ? 'btn-danger' : 'btn-success' %> btn-sm"
+                          data-confirm="Are you sure you want to <%= t.isActive ? 'deactivate' : 'activate' %> trainer <%= t.name %>?"
+                          data-confirm-title="<%= t.isActive ? 'Deactivate Trainer' : 'Activate Trainer' %>"
+                          data-action="/admin/trainers/<%= t._id %>/toggle-status">
+                          <%= t.isActive ? 'Deactivate' : 'Activate' %>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Collapsible Edit Row -->
+                <tr id="editTrainer_<%= t._id %>" style="display: none; background-color: #f8fafc;">
+                  <td colspan="7" style="padding: 1.25rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.75rem;">Edit Trainer: <%= t.name %></div>
+                    <form action="/admin/trainers/<%= t._id %>/edit" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
+                      <div>
+                        <label class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" value="<%= t.name %>" required>
+                      </div>
+                      <div>
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control" value="<%= t.phone || '' %>">
+                      </div>
+                      <div>
+                        <label class="form-label">Specialization</label>
+                        <input type="text" name="specialization" class="form-control" value="<%= t.specialization || '' %>">
+                      </div>
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('editTrainer_<%= t._id %>').style.display = 'none'">Cancel</button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 2.5rem;">
+                  <div class="empty-state" style="padding: 0;">
+                    <p class="empty-state-title">No trainers registered</p>
+                    <p class="empty-state-desc">Click "Add New Trainer" above to create certified trainer accounts.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

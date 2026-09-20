@@ -1,0 +1,146 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+            <a href="/trainer/members/<%= member._id %>">&larr; Back to <%= member.name %>'s Profile</a>
+          </div>
+          <h1 class="page-title">Manage Workout Plan</h1>
+          <p class="page-subtitle">Designing customized daily routine for <%= member.name %></p>
+        </div>
+      </div>
+
+      <!-- Plan Info Card -->
+      <div class="card">
+        <form action="/trainer/members/<%= member._id %>/workout/info" method="POST">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="title">Plan Title *</label>
+              <input type="text" id="title" name="title" class="form-control"
+                value="<%= workoutPlan ? workoutPlan.title : `${member.name}'s Workout Routine` %>" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="goal">Primary Fitness Goal</label>
+              <input type="text" id="goal" name="goal" class="form-control"
+                placeholder="e.g. Hypertrophy, Fat Loss, Core Strength"
+                value="<%= workoutPlan ? workoutPlan.goal : '' %>">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="notes">General Trainer Instructions / Notes</label>
+            <textarea id="notes" name="notes" class="form-control" rows="2"
+              placeholder="Warm up for 5-10 minutes before every session. Hydrate well."><%= workoutPlan ? workoutPlan.notes : '' %></textarea>
+          </div>
+          <button type="submit" class="btn btn-secondary btn-sm">Save Plan Info</button>
+        </form>
+      </div>
+
+      <!-- Quick Add Exercise Form -->
+      <div class="card" style="border-left: 4px solid var(--primary);">
+        <div class="card-header">
+          <h2 class="card-title">Add Exercise to Routine</h2>
+        </div>
+
+        <form action="/trainer/members/<%= member._id %>/workout/add-exercise" method="POST">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="dayOfWeek">Day of Week *</label>
+              <select id="dayOfWeek" name="dayOfWeek" class="form-select" required>
+                <% daysOfWeek.forEach(day => { %>
+                  <option value="<%= day %>"><%= day %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="exerciseName">Exercise Name *</label>
+              <input type="text" id="exerciseName" name="exerciseName" class="form-control"
+                placeholder="e.g. Barbell Bench Press, Deadlift, Squats" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sets">Sets *</label>
+              <input type="number" id="sets" name="sets" class="form-control" placeholder="e.g. 4" min="1" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reps">Reps *</label>
+              <input type="text" id="reps" name="reps" class="form-control" placeholder="e.g. 8-10 or 12" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="restSeconds">Rest (Seconds)</label>
+              <input type="number" id="restSeconds" name="restSeconds" class="form-control" value="60" min="0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="notes">Form Notes / Cue</label>
+              <input type="text" id="notes" name="notes" class="form-control" placeholder="e.g. Controlled eccentric, pause at bottom">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">+ Add Exercise</button>
+        </form>
+      </div>
+
+      <!-- Workout Routine Grouped By Day -->
+      <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">
+        Weekly Schedule
+      </h2>
+
+      <div class="workout-days-container">
+        <% daysOfWeek.forEach(day => { %>
+          <% const exercises = exercisesByDay[day] || []; %>
+          <div class="workout-day-card">
+            <div class="workout-day-header">
+              <span class="workout-day-title"><%= day %></span>
+              <span class="workout-day-badge"><%= exercises.length %> Exercises</span>
+            </div>
+
+            <div class="workout-exercises-list">
+              <% if (exercises.length > 0) { %>
+                <% exercises.forEach(ex => { %>
+                  <div class="exercise-item">
+                    <div class="exercise-header">
+                      <span class="exercise-name"><%= ex.exerciseName %></span>
+                      <form action="/trainer/members/<%= member._id %>/workout/delete-exercise/<%= ex._id %>" method="POST" style="display:inline;">
+                        <button type="button" class="btn btn-danger btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.75rem;"
+                          data-confirm="Remove '<%= ex.exerciseName %>' from <%= day %>?"
+                          data-confirm-title="Remove Exercise"
+                          data-action="/trainer/members/<%= member._id %>/workout/delete-exercise/<%= ex._id %>">
+                          &times; Remove
+                        </button>
+                      </form>
+                    </div>
+                    <div class="exercise-meta">
+                      <span class="exercise-pill"><%= ex.sets %> sets × <%= ex.reps %></span>
+                      <span>Rest: <%= ex.restSeconds %>s</span>
+                    </div>
+                    <% if (ex.notes) { %>
+                      <div class="exercise-notes"><%= ex.notes %></div>
+                    <% } %>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem 0;">
+                  Rest day / No exercises scheduled
+                </div>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

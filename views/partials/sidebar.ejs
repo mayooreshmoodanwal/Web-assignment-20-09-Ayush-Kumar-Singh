@@ -1,0 +1,92 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo-icon">G</div>
+    <div>
+      <div class="sidebar-title">GymFlow</div>
+      <div class="sidebar-subtitle">Fitness Management</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <% if (typeof user !== 'undefined' && user) { %>
+      <% if (user.role === 'admin') { %>
+        <!-- ADMIN NAVIGATION -->
+        <a href="/admin/dashboard" class="sidebar-link <%= currentPath === '/admin/dashboard' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="/admin/members" class="sidebar-link <%= currentPath.startsWith('/admin/members') && !currentPath.includes('expiring') ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <span>Members</span>
+        </a>
+
+        <a href="/admin/trainers" class="sidebar-link <%= currentPath.startsWith('/admin/trainers') ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span>Trainers</span>
+        </a>
+
+        <a href="/admin/membership-plans" class="sidebar-link <%= currentPath.startsWith('/admin/membership-plans') ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          <span>Membership Plans</span>
+        </a>
+
+        <a href="/admin/memberships/expiring" class="sidebar-link <%= currentPath === '/admin/memberships/expiring' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Expiring Soon</span>
+        </a>
+
+        <a href="/admin/attendance" class="sidebar-link <%= currentPath === '/admin/attendance' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Attendance</span>
+        </a>
+
+      <% } else if (user.role === 'trainer') { %>
+        <!-- TRAINER NAVIGATION -->
+        <a href="/trainer/dashboard" class="sidebar-link <%= currentPath === '/trainer/dashboard' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="/trainer/members" class="sidebar-link <%= currentPath.startsWith('/trainer/members') ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span>My Members</span>
+        </a>
+
+      <% } else if (user.role === 'member') { %>
+        <!-- MEMBER NAVIGATION -->
+        <a href="/member/dashboard" class="sidebar-link <%= currentPath === '/member/dashboard' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="/member/workout" class="sidebar-link <%= currentPath === '/member/workout' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span>My Workout</span>
+        </a>
+
+        <a href="/member/attendance" class="sidebar-link <%= currentPath === '/member/attendance' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+          <span>Attendance</span>
+        </a>
+
+        <a href="/member/progress" class="sidebar-link <%= currentPath === '/member/progress' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+          <span>Progress</span>
+        </a>
+
+        <a href="/member/profile" class="sidebar-link <%= currentPath === '/member/profile' ? 'active' : '' %>">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span>Profile</span>
+        </a>
+      <% } %>
+
+      <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid #1e293b;">
+        <a href="/logout" class="sidebar-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Logout</span>
+        </a>
+      </div>
+    <% } %>
+  </nav>
+</aside>

@@ -1,0 +1,37 @@
+<header class="top-navbar">
+  <div class="navbar-left">
+    <button class="mobile-nav-toggle" aria-label="Toggle Navigation Menu">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+    <div style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary);">
+      GymFlow
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <% if (typeof user !== 'undefined' && user) { %>
+      <div class="user-profile-badge">
+        <div class="user-avatar">
+          <%= user.name.charAt(0).toUpperCase() %>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <span style="font-weight: 600; font-size: 0.875rem;"><%= user.name %></span>
+          <span class="badge badge-role-<%= user.role %>" style="font-size: 0.7rem; align-self: flex-start;">
+            <%= user.role %>
+          </span>
+        </div>
+      </div>
+      <a href="/logout" class="btn btn-secondary btn-sm" style="margin-left: 0.5rem;" title="Sign out">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        <span>Logout</span>
+      </a>
+    <% } else { %>
+      <a href="/login" class="btn btn-secondary btn-sm">Login</a>
+      <a href="/register" class="btn btn-primary btn-sm">Join Gym</a>
+    <% } %>
+  </div>
+</header>

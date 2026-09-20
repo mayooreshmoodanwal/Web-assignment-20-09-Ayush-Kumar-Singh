@@ -1,0 +1,204 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+            <a href="/trainer/members">&larr; Back to My Members</a>
+          </div>
+          <h1 class="page-title"><%= member.name %></h1>
+          <p class="page-subtitle">Client Profile & Fitness History</p>
+        </div>
+        <a href="/trainer/members/<%= member._id %>/workout" class="btn btn-primary">
+          Manage Workout Plan
+        </a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+        <!-- Client Profile Details -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Client Information</h2>
+            <span class="badge <%= member.isActive ? 'badge-active' : 'badge-expired' %>">
+              <%= member.isActive ? 'Active Member' : 'Inactive' %>
+            </span>
+          </div>
+
+          <div style="font-size: 0.9rem; line-height: 1.8; color: var(--text-secondary);">
+            <div><strong style="color: var(--text-primary);">Email:</strong> <%= member.email %></div>
+            <div><strong style="color: var(--text-primary);">Phone:</strong> <%= member.phone || 'Not provided' %></div>
+            <div><strong style="color: var(--text-primary);">Gender:</strong> <%= member.gender || 'Not specified' %></div>
+            <div><strong style="color: var(--text-primary);">Joined:</strong> <%= formatDate(member.createdAt) %></div>
+          </div>
+        </div>
+
+        <!-- Membership Overview (Read-Only) -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Membership Status</h2>
+            <% if (membership) { %>
+              <% const status = getMembershipStatus(membership.expiryDate); %>
+              <% if (status === 'active') { %>
+                <span class="badge badge-active">Active (<%= daysUntilExpiry(membership.expiryDate) %>d left)</span>
+              <% } else if (status === 'expiring_soon') { %>
+                <span class="badge badge-expiring">Expiring Soon (<%= daysUntilExpiry(membership.expiryDate) %>d)</span>
+              <% } else { %>
+                <span class="badge badge-expired">Expired</span>
+              <% } %>
+            <% } else { %>
+              <span class="badge badge-role-member">No Membership</span>
+            <% } %>
+          </div>
+
+          <% if (membership && membership.plan) { %>
+            <div style="background-color: #f8fafc; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">
+                <%= membership.plan.name %>
+              </div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong>Start Date:</strong> <%= formatDate(membership.startDate) %><br>
+                <strong>Expiry Date:</strong> <%= formatDate(membership.expiryDate) %><br>
+                <span style="font-size: 0.8rem; color: #64748b; font-style: italic;">(Managed by Gym Admin)</span>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="empty-state" style="padding: 1rem 0;">
+              <p class="empty-state-title">No Active Membership</p>
+              <p class="empty-state-desc">Client currently does not have an active membership plan.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Current Workout Plan Preview -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Current Workout Routine</h2>
+          <a href="/trainer/members/<%= member._id %>/workout" class="btn btn-secondary btn-sm">Edit Routine</a>
+        </div>
+
+        <% if (workoutPlan && workoutPlan.exercises && workoutPlan.exercises.length > 0) { %>
+          <div style="margin-bottom: 1rem;">
+            <strong><%= workoutPlan.title %></strong>
+            <% if (workoutPlan.goal) { %>
+              <span style="color: var(--text-secondary);"> — Goal: <%= workoutPlan.goal %></span>
+            <% } %>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Exercise</th>
+                  <th>Sets × Reps</th>
+                  <th>Rest</th>
+                  <th>Instructions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% workoutPlan.exercises.forEach(ex => { %>
+                  <tr>
+                    <td><strong><%= ex.dayOfWeek %></strong></td>
+                    <td style="font-weight: 600;"><%= ex.exerciseName %></td>
+                    <td><span class="exercise-pill"><%= ex.sets %> × <%= ex.reps %></span></td>
+                    <td><%= ex.restSeconds %>s</td>
+                    <td style="color: #64748b;"><%= ex.notes || '—' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state" style="padding: 2rem 0;">
+            <p class="empty-state-title">Your client has not been assigned a workout plan yet.</p>
+            <p class="empty-state-desc">Click "Manage Workout Plan" above to create custom daily workout routines for <%= member.name %>.</p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Attendance & Weight History Grids -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Attendance History -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Client Attendance (Last 20)</h2>
+            <span class="badge badge-active"><%= attendanceHistory.length %> Records</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Check-In Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (attendanceHistory && attendanceHistory.length > 0) { %>
+                  <% attendanceHistory.forEach(att => { %>
+                    <tr>
+                      <td><%= formatDate(att.date) %></td>
+                      <td><%= formatTime(att.checkInTime) %></td>
+                      <td><span class="badge badge-active">Present</span></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">
+                      No attendance records yet.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Weight History -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Client Weight Logs (Last 20)</h2>
+            <span class="badge badge-role-trainer"><%= weightLogs.length %> Logs</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Weight (kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (weightLogs && weightLogs.length > 0) { %>
+                  <% weightLogs.forEach(w => { %>
+                    <tr>
+                      <td><%= formatDate(w.loggedAt) %></td>
+                      <td><strong><%= w.weight %> kg</strong></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">
+                      No weight logs recorded yet.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gym Attendance Inspector</h1>
+          <p class="page-subtitle">Track daily member attendance and check-in times</p>
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700;">
+          Total Checked-In: <span class="badge badge-active" style="font-size: 1rem;"><%= totalCount %> Members</span>
+        </div>
+      </div>
+
+      <!-- Date & Search Filter Bar -->
+      <form action="/admin/attendance" method="GET" class="filter-bar">
+        <div style="flex: 1; min-width: 180px;">
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.2rem;">Select Date</label>
+          <input type="date" name="date" class="form-control" value="<%= selectedDate %>">
+        </div>
+
+        <div style="flex: 2; min-width: 200px;">
+          <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.2rem;">Search Member</label>
+          <input type="text" name="search" class="form-control" placeholder="Search by name, email, or phone..." value="<%= search %>">
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-self: flex-end;">
+          <button type="submit" class="btn btn-primary">Apply Filter</button>
+          <a href="/admin/attendance" class="btn btn-secondary">Today</a>
+        </div>
+      </form>
+
+      <!-- Attendance Table -->
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Member Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Date</th>
+              <th>Check-In Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (attendances && attendances.length > 0) { %>
+              <% attendances.forEach(a => { %>
+                <tr>
+                  <td style="font-weight: 600;">
+                    <% if (a.member) { %>
+                      <a href="/admin/members/<%= a.member._id %>"><%= a.member.name %></a>
+                    <% } else { %>
+                      Unknown Member
+                    <% } %>
+                  </td>
+                  <td><%= a.member ? a.member.email : '—' %></td>
+                  <td><%= a.member ? a.member.phone || '—' : '—' %></td>
+                  <td><%= formatDate(a.date) %></td>
+                  <td>
+                    <strong><%= formatTime(a.checkInTime) %></strong>
+                  </td>
+                  <td><span class="badge badge-active">Present</span></td>
+                  <td>
+                    <% if (a.member) { %>
+                      <a href="/admin/members/<%= a.member._id %>" class="btn btn-secondary btn-sm">
+                        View Profile
+                      </a>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 2.5rem;">
+                  <div class="empty-state" style="padding: 0;">
+                    <p class="empty-state-title">No attendance records found</p>
+                    <p class="empty-state-desc">No members checked in on <%= formatDate(selectedDate) %></p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

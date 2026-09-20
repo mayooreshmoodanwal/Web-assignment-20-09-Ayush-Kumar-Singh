@@ -1,0 +1,78 @@
+<%- include('partials/header') %>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column; background: #0f172a; color: #ffffff;">
+  <!-- Landing Navigation -->
+  <header style="padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08);">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="sidebar-logo-icon" style="width: 40px; height: 40px; font-size: 1.4rem;">G</div>
+      <div style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; font-family: 'Outfit', sans-serif;">GymFlow</div>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <a href="/login" class="btn btn-secondary" style="background: transparent; color: #ffffff; border-color: rgba(255,255,255,0.2);">Login</a>
+      <a href="/register" class="btn btn-primary">Join Gym</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4rem 1.5rem;">
+    <div style="max-width: 800px; margin: 0 auto;">
+      <span style="display: inline-block; padding: 0.35rem 1rem; background: rgba(37, 99, 235, 0.15); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 9999px; color: #60a5fa; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">
+        Complete Gym & Workout Management System
+      </span>
+      <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.03em;">
+        Manage Memberships.<br>
+        <span style="background: linear-gradient(135deg, #38bdf8, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Track Progress.</span><br>
+        Train Smarter.
+      </h1>
+      <p style="font-size: 1.15rem; color: #94a3b8; max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.6;">
+        GymFlow brings members, certified trainers, and gym administrators together on one unified platform. Automated membership expiry, custom workout routines, daily attendance, and real-time weight progress.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/login" class="btn btn-primary btn-lg" style="min-width: 160px;">Login to Portal</a>
+        <a href="/register" class="btn btn-secondary btn-lg" style="min-width: 160px; background: rgba(255,255,255,0.05); color: #ffffff; border-color: rgba(255,255,255,0.15);">Join as Member</a>
+      </div>
+    </div>
+
+    <!-- Core Features Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; max-width: 1100px; width: 100%; margin-top: 5rem; text-align: left;">
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 1.75rem; border-radius: 12px;">
+        <div style="width: 44px; height: 44px; background: rgba(37, 99, 235, 0.2); color: #60a5fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #f8fafc;">Membership Management</h3>
+        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.5;">Automated duration calculations, instant renewals, and early alerts for memberships expiring in the next 7 days.</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 1.75rem; border-radius: 12px;">
+        <div style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.2); color: #34d399; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #f8fafc;">Workout Planning</h3>
+        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.5;">Trainers build tailored routines grouped by day of the week. Members view their exact exercises and target reps.</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 1.75rem; border-radius: 12px;">
+        <div style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #f8fafc;">Attendance Tracking</h3>
+        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.5;">Members check in daily with duplicate prevention. Admins inspect live daily attendance and filter past dates.</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 1.75rem; border-radius: 12px;">
+        <div style="width: 44px; height: 44px; background: rgba(6, 182, 212, 0.2); color: #38bdf8; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+        </div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #f8fafc;">Progress Tracking</h3>
+        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.5;">Body weight log with dynamic Chart.js visualization. Track start weight, latest weight, and recorded changes.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 2rem; color: #64748b; font-size: 0.875rem; border-top: 1px solid rgba(255,255,255,0.08);">
+    &copy; <%= new Date().getFullYear() %> GymFlow. All rights reserved.
+  </footer>
+</div>
+
+<%- include('partials/footer') %>

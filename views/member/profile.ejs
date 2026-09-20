@@ -1,0 +1,117 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Profile</h1>
+          <p class="page-subtitle">View and update your personal contact details</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Editable Profile Information -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Personal Information</h2>
+          </div>
+
+          <form action="/member/profile" method="POST">
+            <div class="form-group">
+              <label class="form-label" for="name">Full Name *</label>
+              <input type="text" id="name" name="name" class="form-control" value="<%= member.name %>" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input type="email" id="email" class="form-control" value="<%= member.email %>" disabled
+                style="background-color: #f1f5f9; cursor: not-allowed;">
+              <span class="form-text">Email address cannot be changed directly. Contact gym staff for email updates.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" class="form-control" value="<%= member.phone || '' %>" placeholder="+91 98765 43210">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Member Since</label>
+              <input type="text" class="form-control" value="<%= formatDate(member.createdAt) %>" disabled
+                style="background-color: #f1f5f9; cursor: not-allowed;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Update Profile</button>
+          </form>
+        </div>
+
+        <!-- Gym Affiliation & Membership (Read-Only) -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Gym Subscription & Coach</h2>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <!-- Membership Box -->
+            <div style="padding: 1.25rem; background-color: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                Current Membership
+              </div>
+              <% if (latestMembership && latestMembership.plan) { %>
+                <div style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
+                  <%= latestMembership.plan.name %>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                  <strong>Start Date:</strong> <%= formatDate(latestMembership.startDate) %><br>
+                  <strong>Expiry Date:</strong> <%= formatDate(latestMembership.expiryDate) %><br>
+                  <strong>Status:</strong>
+                  <% const status = getMembershipStatus(latestMembership.expiryDate); %>
+                  <% if (status === 'active') { %>
+                    <span class="badge badge-active">Active (<%= daysUntilExpiry(latestMembership.expiryDate) %>d left)</span>
+                  <% } else if (status === 'expiring_soon') { %>
+                    <span class="badge badge-expiring">Expiring Soon (<%= daysUntilExpiry(latestMembership.expiryDate) %>d)</span>
+                  <% } else { %>
+                    <span class="badge badge-expired">Expired</span>
+                  <% } %>
+                </div>
+              <% } else { %>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+                  No active membership plan. Please contact the front desk to subscribe.
+                </p>
+              <% } %>
+            </div>
+
+            <!-- Trainer Box -->
+            <div style="padding: 1.25rem; background-color: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                Assigned Trainer
+              </div>
+              <% if (member.trainer) { %>
+                <div style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
+                  <%= member.trainer.name %>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                  <strong>Specialization:</strong> <%= member.trainer.specialization || 'Fitness Trainer' %><br>
+                  <strong>Email:</strong> <%= member.trainer.email %><br>
+                  <strong>Phone:</strong> <%= member.trainer.phone || 'Available on floor' %>
+                </div>
+              <% } else { %>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">
+                  No trainer assigned yet. Ask gym administration to assign a trainer to your profile.
+                </p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,305 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <!-- Header & Breadcrumb -->
+      <div class="page-header">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+            <a href="/admin/members">&larr; Back to Member Directory</a>
+          </div>
+          <h1 class="page-title"><%= member.name %></h1>
+          <p class="page-subtitle">Member since <%= formatDate(member.createdAt) %></p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <form action="/admin/members/<%= member._id %>/toggle-status" method="POST" style="display:inline;">
+            <button type="button" class="btn <%= member.isActive ? 'btn-danger' : 'btn-success' %> btn-sm"
+              data-confirm="Are you sure you want to <%= member.isActive ? 'deactivate' : 'activate' %> this member?"
+              data-confirm-title="<%= member.isActive ? 'Deactivate Member' : 'Activate Member' %>"
+              data-action="/admin/members/<%= member._id %>/toggle-status">
+              <%= member.isActive ? 'Deactivate Account' : 'Activate Account' %>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+        <!-- Member Profile & Details Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Profile Information</h2>
+            <span class="badge <%= member.isActive ? 'badge-active' : 'badge-expired' %>">
+              <%= member.isActive ? 'Active Member' : 'Inactive' %>
+            </span>
+          </div>
+
+          <form action="/admin/members/<%= member._id %>/edit" method="POST">
+            <div class="form-group">
+              <label class="form-label" for="name">Full Name</label>
+              <input type="text" id="name" name="name" class="form-control" value="<%= member.name %>" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input type="email" id="email" name="email" class="form-control" value="<%= member.email %>" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone Number</label>
+              <input type="text" id="phone" name="phone" class="form-control" value="<%= member.phone || '' %>">
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="gender">Gender</label>
+                <select id="gender" name="gender" class="form-select">
+                  <option value="" <%= !member.gender ? 'selected' : '' %>>Not Specified</option>
+                  <option value="male" <%= member.gender === 'male' ? 'selected' : '' %>>Male</option>
+                  <option value="female" <%= member.gender === 'female' ? 'selected' : '' %>>Female</option>
+                  <option value="other" <%= member.gender === 'other' ? 'selected' : '' %>>Other</option>
+                  <option value="prefer_not_to_say" <%= member.gender === 'prefer_not_to_say' ? 'selected' : '' %>>Prefer not to say</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dateOfBirth">Date of Birth</label>
+                <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control"
+                  value="<%= member.dateOfBirth ? member.dateOfBirth.toISOString().split('T')[0] : '' %>">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">Save Changes</button>
+          </form>
+
+          <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--border-color);">
+
+          <!-- Trainer Assignment Section -->
+          <div class="card-header" style="padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+            <h3 class="card-title" style="font-size: 1rem;">Assigned Trainer</h3>
+          </div>
+          <form action="/admin/members/<%= member._id %>/assign-trainer" method="POST">
+            <div class="form-group">
+              <select name="trainerId" class="form-select">
+                <option value="none" <%= !member.trainer ? 'selected' : '' %>>No Trainer Assigned</option>
+                <% trainers.forEach(t => { %>
+                  <option value="<%= t._id %>" <%= member.trainer && member.trainer._id.toString() === t._id.toString() ? 'selected' : '' %>>
+                    <%= t.name %> (<%= t.specialization || 'Fitness' %>)
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm">Update Trainer</button>
+          </form>
+        </div>
+
+        <!-- Membership Management Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Membership Status</h2>
+            <% if (currentMembership) { %>
+              <% const status = getMembershipStatus(currentMembership.expiryDate); %>
+              <% if (status === 'active') { %>
+                <span class="badge badge-active">Active (<%= daysUntilExpiry(currentMembership.expiryDate) %>d left)</span>
+              <% } else if (status === 'expiring_soon') { %>
+                <span class="badge badge-expiring">Expiring Soon (<%= daysUntilExpiry(currentMembership.expiryDate) %>d)</span>
+              <% } else { %>
+                <span class="badge badge-expired">Expired</span>
+              <% } %>
+            <% } else { %>
+              <span class="badge badge-role-member">No Membership</span>
+            <% } %>
+          </div>
+
+          <% if (currentMembership && currentMembership.plan) { %>
+            <div style="background-color: #f8fafc; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+              <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
+                <%= currentMembership.plan.name %>
+              </div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong>Duration:</strong> <%= currentMembership.plan.durationDays %> Days<br>
+                <strong>Start Date:</strong> <%= formatDate(currentMembership.startDate) %><br>
+                <strong>Expiry Date:</strong> <%= formatDate(currentMembership.expiryDate) %><br>
+                <strong>Amount Paid:</strong> ₹<%= currentMembership.amountPaid %>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="empty-state" style="padding: 1.5rem 0.5rem;">
+              <p class="empty-state-title">No Active Membership</p>
+              <p class="empty-state-desc">Assign a plan below to activate this member's subscription.</p>
+            </div>
+          <% } %>
+
+          <!-- Assign / Renew Form -->
+          <div class="card-header" style="padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+            <h3 class="card-title" style="font-size: 1rem;">
+              <%= currentMembership ? 'Renew Membership' : 'Assign Membership' %>
+            </h3>
+          </div>
+
+          <form action="/admin/members/<%= member._id %>/<%= currentMembership ? 'renew-membership' : 'assign-membership' %>" method="POST">
+            <div class="form-group">
+              <label class="form-label" for="planSelect">Select Plan *</label>
+              <select id="planSelect" name="planId" class="form-select" required>
+                <% plans.forEach(p => { %>
+                  <option value="<%= p._id %>" data-price="<%= p.price %>">
+                    <%= p.name %> — <%= p.durationDays %> Days (₹<%= p.price %>)
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="startDate">Start Date</label>
+                <input type="date" id="startDate" name="startDate" class="form-control"
+                  value="<%= new Date().toISOString().split('T')[0] %>">
+                <span class="form-text">Expiry date is calculated automatically.</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="amountPaid">Amount Paid (₹)</label>
+                <input type="number" id="amountPaid" name="amountPaid" class="form-control" placeholder="Leave blank for plan price">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm">
+              <%= currentMembership ? 'Renew Subscription' : 'Assign Plan' %>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Workout Plan Summary -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Assigned Workout Plan</h2>
+          <% if (workoutPlan) { %>
+            <span class="badge badge-active"><%= workoutPlan.exercises ? workoutPlan.exercises.length : 0 %> Exercises</span>
+          <% } else { %>
+            <span class="badge badge-role-member">No Plan</span>
+          <% } %>
+        </div>
+
+        <% if (workoutPlan && workoutPlan.exercises && workoutPlan.exercises.length > 0) { %>
+          <div style="margin-bottom: 1rem;">
+            <strong><%= workoutPlan.title %></strong>
+            <% if (workoutPlan.goal) { %>
+              <span style="color: var(--text-secondary);"> — Goal: <%= workoutPlan.goal %></span>
+            <% } %>
+            <% if (workoutPlan.trainer) { %>
+              <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.2rem;">
+                Created by Trainer: <%= workoutPlan.trainer.name %>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Exercise</th>
+                  <th>Sets × Reps</th>
+                  <th>Rest</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% workoutPlan.exercises.forEach(ex => { %>
+                  <tr>
+                    <td><strong><%= ex.dayOfWeek %></strong></td>
+                    <td style="font-weight: 600;"><%= ex.exerciseName %></td>
+                    <td><span class="exercise-pill"><%= ex.sets %> × <%= ex.reps %></span></td>
+                    <td><%= ex.restSeconds %>s</td>
+                    <td style="color: #64748b;"><%= ex.notes || '—' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="empty-state" style="padding: 1.5rem 0;">
+            <p class="empty-state-title">No workout plan assigned yet</p>
+            <p class="empty-state-desc">The assigned trainer can create and customize workout routines for this member.</p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Attendance & Weight Tabs / Grids -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Attendance History -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Attendance (Last 30)</h2>
+            <span class="badge badge-active"><%= attendanceHistory.length %> Records</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Check-In Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (attendanceHistory && attendanceHistory.length > 0) { %>
+                  <% attendanceHistory.forEach(att => { %>
+                    <tr>
+                      <td><%= formatDate(att.date) %></td>
+                      <td><%= formatTime(att.checkInTime) %></td>
+                      <td><span class="badge badge-active">Present</span></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">
+                      No attendance records yet.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Weight History -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Weight Log History</h2>
+            <span class="badge badge-role-trainer"><%= weightLogs.length %> Logs</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Logged Date</th>
+                  <th>Weight (kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (weightLogs && weightLogs.length > 0) { %>
+                  <% weightLogs.forEach(w => { %>
+                    <tr>
+                      <td><%= formatDate(w.loggedAt) %></td>
+                      <td><strong><%= w.weight %> kg</strong></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">
+                      No weight logs recorded yet.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

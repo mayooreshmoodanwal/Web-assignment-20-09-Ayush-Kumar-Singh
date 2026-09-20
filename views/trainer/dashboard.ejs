@@ -1,0 +1,148 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Trainer Dashboard</h1>
+          <p class="page-subtitle">Welcome back, <%= user.name %>! Manage your clients and their workout routines</p>
+        </div>
+        <a href="/trainer/members" class="btn btn-primary">View All Clients</a>
+      </div>
+
+      <!-- Trainer Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-blue">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.totalAssigned %></div>
+            <div class="metric-label">Assigned Members</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-green">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.activeMembersCount %></div>
+            <div class="metric-label">Active Memberships</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-amber">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.membersWithoutPlanCount %></div>
+            <div class="metric-label">Missing Workout Plan</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-cyan">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.todayAttendanceCount %></div>
+            <div class="metric-label">Client Check-Ins Today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assigned Members Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">My Assigned Clients</h2>
+          <span class="badge badge-role-trainer"><%= members.length %> Clients</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Membership</th>
+                <th>Expiry</th>
+                <th>Workout Plan Status</th>
+                <th>Last Attendance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (members && members.length > 0) { %>
+                <% members.forEach(m => { %>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;">
+                        <a href="/trainer/members/<%= m._id %>"><%= m.name %></a>
+                      </div>
+                      <div style="font-size: 0.8rem; color: #64748b;">
+                        <%= m.email %> | <%= m.phone || 'No phone' %>
+                      </div>
+                    </td>
+                    <td>
+                      <% if (m.membership && m.membership.plan) { %>
+                        <strong><%= m.membership.plan.name %></strong>
+                      <% } else { %>
+                        <span style="color: var(--text-muted);">None</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (m.membershipStatus === 'active') { %>
+                        <span class="badge badge-active"><%= formatDate(m.expiryDate) %> (<%= m.daysLeft %>d)</span>
+                      <% } else if (m.membershipStatus === 'expiring_soon') { %>
+                        <span class="badge badge-expiring"><%= formatDate(m.expiryDate) %> (<%= m.daysLeft %>d)</span>
+                      <% } else if (m.membershipStatus === 'expired') { %>
+                        <span class="badge badge-expired">Expired</span>
+                      <% } else { %>
+                        <span class="badge badge-role-member">No Plan</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (m.hasWorkoutPlan) { %>
+                        <span class="badge badge-active">Plan Active</span>
+                      <% } else { %>
+                        <span class="badge badge-expiring">No Plan Set</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <%= m.lastAttendance ? formatDateTime(m.lastAttendance) : 'Never' %>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 0.5rem;">
+                        <a href="/trainer/members/<%= m._id %>" class="btn btn-secondary btn-sm">Profile</a>
+                        <a href="/trainer/members/<%= m._id %>/workout" class="btn btn-primary btn-sm">Workout Plan</a>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 2.5rem;">
+                    <div class="empty-state" style="padding: 0;">
+                      <p class="empty-state-title">No members have been assigned to you yet.</p>
+                      <p class="empty-state-desc">The gym administrator assigns members to certified trainers.</p>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

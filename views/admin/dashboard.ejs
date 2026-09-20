@@ -1,0 +1,237 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Gym Analytics & Overview</h1>
+          <p class="page-subtitle">Real-time statistics for members, trainers, attendance, and plans</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <a href="/admin/members" class="btn btn-secondary">Manage Members</a>
+          <a href="/admin/trainers/create" class="btn btn-primary">+ Add Trainer</a>
+        </div>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-blue">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.totalMembers %></div>
+            <div class="metric-label">Total Members</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-green">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.activeMembersCount %></div>
+            <div class="metric-label">Active Members</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-amber">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.expiringSoonCount %></div>
+            <div class="metric-label">Expiring in 7 Days</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-rose">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.expiredMembersCount %></div>
+            <div class="metric-label">Expired Plans</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-cyan">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div class="metric-value"><%= metrics.todayAttendanceCount %></div>
+            <div class="metric-label">Today's Attendance</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts & Statistics Section -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+        <!-- Plan Distribution Chart -->
+        <div class="card" style="margin-bottom: 0;">
+          <div class="card-header">
+            <h2 class="card-title">Active Membership Distribution</h2>
+            <span class="badge badge-active"><%= metrics.activeMembersCount %> Active</span>
+          </div>
+          <% if (planDistribution && planDistribution.length > 0) { %>
+            <div style="height: 240px; position: relative;">
+              <canvas id="planDistributionChart"
+                data-labels='<%- JSON.stringify(planDistribution.map(p => p.name)) %>'
+                data-values='<%- JSON.stringify(planDistribution.map(p => p.count)) %>'>
+              </canvas>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 1rem;">
+              <% planDistribution.forEach(p => { %>
+                <div style="font-size: 0.825rem; color: var(--text-secondary);">
+                  <strong><%= p.name %>:</strong> <%= p.count %> members
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="empty-state" style="padding: 2rem 1rem;">
+              <p class="empty-state-title">No Active Plans Yet</p>
+              <p class="empty-state-desc">Assign membership plans to gym members to see the plan distribution chart.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Trainer Capacity & Assignments -->
+        <div class="card" style="margin-bottom: 0;">
+          <div class="card-header">
+            <h2 class="card-title">Trainer Assignments</h2>
+            <a href="/admin/trainers" class="btn btn-secondary btn-sm">View All</a>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Trainer</th>
+                  <th>Specialization</th>
+                  <th>Assigned Members</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (trainerStats && trainerStats.length > 0) { %>
+                  <% trainerStats.forEach(trainer => { %>
+                    <tr>
+                      <td style="font-weight: 600;"><%= trainer.name %></td>
+                      <td><span class="badge badge-role-trainer"><%= trainer.specialization %></span></td>
+                      <td><strong><%= trainer.assignedCount %></strong> members</td>
+                      <td>
+                        <span class="badge <%= trainer.isActive ? 'badge-active' : 'badge-expired' %>">
+                          <%= trainer.isActive ? 'Active' : 'Inactive' %>
+                        </span>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary);">No trainers registered yet.</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Tables Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+        <!-- Memberships Expiring Soon -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Expiring Soon (Next 7 Days)</h2>
+            <a href="/admin/memberships/expiring" class="btn btn-secondary btn-sm">View Expiring</a>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Plan</th>
+                  <th>Expiry Date</th>
+                  <th>Days Left</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (expiringMemberships && expiringMemberships.length > 0) { %>
+                  <% expiringMemberships.forEach(m => { %>
+                    <tr>
+                      <td>
+                        <a href="/admin/members/<%= m.member ? m.member._id : '' %>" style="font-weight: 600;">
+                          <%= m.member ? m.member.name : 'Unknown' %>
+                        </a>
+                      </td>
+                      <td><%= m.plan ? m.plan.name : 'N/A' %></td>
+                      <td><%= formatDate(m.expiryDate) %></td>
+                      <td>
+                        <span class="badge badge-expiring">
+                          <%= daysUntilExpiry(m.expiryDate) %> days
+                        </span>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">
+                      No memberships expiring in the next 7 days.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Today's Recent Attendance -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Today's Check-Ins</h2>
+            <a href="/admin/attendance" class="btn btn-secondary btn-sm">All Attendance</a>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Check-In Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (recentAttendance && recentAttendance.length > 0) { %>
+                  <% recentAttendance.forEach(a => { %>
+                    <tr>
+                      <td style="font-weight: 600;">
+                        <%= a.member ? a.member.name : 'Unknown Member' %>
+                      </td>
+                      <td><%= formatTime(a.checkInTime) %></td>
+                      <td><span class="badge badge-active">Present</span></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-secondary); padding: 1.5rem;">
+                      No members have checked in today yet.
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

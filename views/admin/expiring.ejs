@@ -1,0 +1,158 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Membership Expiry Tracking</h1>
+          <p class="page-subtitle">Track upcoming renewals (next 7 days) and expired subscriptions</p>
+        </div>
+      </div>
+
+      <!-- Expiring Soon Section -->
+      <div class="card">
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background-color: var(--warning);"></div>
+            <h2 class="card-title">Expiring Soon (Next 7 Days)</h2>
+          </div>
+          <span class="badge badge-expiring"><%= expiringSoon.length %> Memberships</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Plan</th>
+                <th>Trainer</th>
+                <th>Expiry Date</th>
+                <th>Days Remaining</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (expiringSoon && expiringSoon.length > 0) { %>
+                <% expiringSoon.forEach(m => { %>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;">
+                        <a href="/admin/members/<%= m.member ? m.member._id : '' %>">
+                          <%= m.member ? m.member.name : 'Unknown' %>
+                        </a>
+                      </div>
+                      <div style="font-size: 0.8rem; color: #64748b;">
+                        <%= m.member ? m.member.email : '' %> | <%= m.member ? m.member.phone || 'No phone' : '' %>
+                      </div>
+                    </td>
+                    <td><strong><%= m.plan ? m.plan.name : 'N/A' %></strong></td>
+                    <td>
+                      <% if (m.member && m.member.trainer) { %>
+                        <span class="badge badge-role-trainer"><%= m.member.trainer.name %></span>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Unassigned</span>
+                      <% } %>
+                    </td>
+                    <td><%= formatDate(m.expiryDate) %></td>
+                    <td>
+                      <span class="badge badge-expiring">
+                        <%= daysUntilExpiry(m.expiryDate) %> days left
+                      </span>
+                    </td>
+                    <td>
+                      <a href="/admin/members/<%= m.member ? m.member._id : '' %>" class="btn btn-primary btn-sm">
+                        Renew Now
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 2rem;">
+                    <p style="color: var(--text-secondary);">No memberships are expiring within the next 7 days.</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Expired Memberships Section -->
+      <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background-color: var(--danger);"></div>
+            <h2 class="card-title">Expired Memberships</h2>
+          </div>
+          <span class="badge badge-expired"><%= expired.length %> Records</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Plan</th>
+                <th>Trainer</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (expired && expired.length > 0) { %>
+                <% expired.forEach(m => { %>
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600;">
+                        <a href="/admin/members/<%= m.member ? m.member._id : '' %>">
+                          <%= m.member ? m.member.name : 'Unknown' %>
+                        </a>
+                      </div>
+                      <div style="font-size: 0.8rem; color: #64748b;">
+                        <%= m.member ? m.member.email : '' %>
+                      </div>
+                    </td>
+                    <td><%= m.plan ? m.plan.name : 'N/A' %></td>
+                    <td>
+                      <% if (m.member && m.member.trainer) { %>
+                        <span class="badge badge-role-trainer"><%= m.member.trainer.name %></span>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">Unassigned</span>
+                      <% } %>
+                    </td>
+                    <td><%= formatDate(m.expiryDate) %></td>
+                    <td>
+                      <span class="badge badge-expired">Expired</span>
+                    </td>
+                    <td>
+                      <a href="/admin/members/<%= m.member ? m.member._id : '' %>" class="btn btn-secondary btn-sm">
+                        Renew
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 2rem;">
+                    <p style="color: var(--text-secondary);">No expired memberships found.</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

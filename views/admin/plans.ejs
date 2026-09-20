@@ -1,0 +1,74 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Membership Plans</h1>
+          <p class="page-subtitle">Configure gym membership packages, durations, and pricing</p>
+        </div>
+        <a href="/admin/membership-plans/create" class="btn btn-primary">+ Create New Plan</a>
+      </div>
+
+      <!-- Plans Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <% if (plans && plans.length > 0) { %>
+          <% plans.forEach(p => { %>
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--primary);">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                  <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);"><%= p.name %></h2>
+                  <span class="badge <%= p.isActive ? 'badge-active' : 'badge-expired' %>">
+                    <%= p.isActive ? 'Active' : 'Inactive' %>
+                  </span>
+                </div>
+
+                <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+                  ₹<%= p.price %>
+                  <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-secondary);">/ <%= p.durationDays %> Days</span>
+                </div>
+
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.5;">
+                  <%= p.description || 'Standard gym access plan.' %>
+                </p>
+
+                <div style="padding: 0.75rem; background-color: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                  <strong>Active Subscribers:</strong> <%= p.activeCount %> members
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <a href="/admin/membership-plans/<%= p._id %>/edit" class="btn btn-secondary btn-sm" style="flex: 1;">
+                  Edit
+                </a>
+
+                <form action="/admin/membership-plans/<%= p._id %>/delete" method="POST" style="flex: 1;">
+                  <button type="button" class="btn btn-danger btn-sm" style="width: 100%;"
+                    data-confirm="Are you sure you want to delete or deactivate plan '<%= p.name %>'?"
+                    data-confirm-title="Delete Membership Plan"
+                    data-action="/admin/membership-plans/<%= p._id %>/delete">
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <p class="empty-state-title">No membership plans created</p>
+            <p class="empty-state-desc">Click "Create New Plan" to set up your first gym subscription plan.</p>
+          </div>
+        <% } %>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

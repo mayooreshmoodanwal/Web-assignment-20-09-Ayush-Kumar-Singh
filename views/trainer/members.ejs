@@ -1,0 +1,92 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Assigned Members</h1>
+          <p class="page-subtitle">View your clients, monitor their progress, and update their workouts</p>
+        </div>
+        <div style="font-weight: 600; color: var(--text-secondary);">
+          Total: <%= members.length %> Clients
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Client Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Current Plan</th>
+              <th>Membership Status</th>
+              <th>Workout Plan</th>
+              <th>Last Seen</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (members && members.length > 0) { %>
+              <% members.forEach(m => { %>
+                <tr>
+                  <td>
+                    <div style="font-weight: 700;">
+                      <a href="/trainer/members/<%= m._id %>"><%= m.name %></a>
+                    </div>
+                  </td>
+                  <td><%= m.email %></td>
+                  <td><%= m.phone || '—' %></td>
+                  <td><%= m.membership && m.membership.plan ? m.membership.plan.name : 'None' %></td>
+                  <td>
+                    <% if (m.membershipStatus === 'active') { %>
+                      <span class="badge badge-active">Active</span>
+                    <% } else if (m.membershipStatus === 'expiring_soon') { %>
+                      <span class="badge badge-expiring">Expiring Soon</span>
+                    <% } else if (m.membershipStatus === 'expired') { %>
+                      <span class="badge badge-expired">Expired</span>
+                    <% } else { %>
+                      <span class="badge badge-role-member">No Plan</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (m.workoutPlanTitle) { %>
+                      <span class="badge badge-active"><%= m.workoutPlanTitle %></span>
+                    <% } else { %>
+                      <span class="badge badge-expiring">No Plan Set</span>
+                    <% } %>
+                  </td>
+                  <td><%= m.lastAttendance ? formatTime(m.lastAttendance) : 'Never' %></td>
+                  <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <a href="/trainer/members/<%= m._id %>" class="btn btn-secondary btn-sm">Profile</a>
+                      <a href="/trainer/members/<%= m._id %>/workout" class="btn btn-primary btn-sm">Manage Workout</a>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 3rem;">
+                  <div class="empty-state" style="padding: 0;">
+                    <p class="empty-state-title">No members have been assigned to you yet.</p>
+                    <p class="empty-state-desc">The gym admin will assign members to you.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,94 @@
+<%- include('../partials/header') %>
+
+<div class="app-container">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="content-body">
+      <%- include('../partials/alerts') %>
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Workout Plan</h1>
+          <p class="page-subtitle">
+            <%= workoutPlan ? workoutPlan.title : 'Personalized Workout Routine' %>
+            <% if (workoutPlan && workoutPlan.goal) { %>
+              &bull; Goal: <strong><%= workoutPlan.goal %></strong>
+            <% } %>
+          </p>
+        </div>
+        <% if (workoutPlan && workoutPlan.trainer) { %>
+          <div style="font-size: 0.9rem; color: var(--text-secondary);">
+            Coach: <strong><%= workoutPlan.trainer.name %></strong>
+            <span class="badge badge-role-trainer" style="margin-left: 0.25rem;"><%= workoutPlan.trainer.specialization || 'Fitness Trainer' %></span>
+          </div>
+        <% } %>
+      </div>
+
+      <% if (workoutPlan && workoutPlan.notes) { %>
+        <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+          <div>
+            <strong>Trainer Instructions:</strong> <%= workoutPlan.notes %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (!workoutPlan || !workoutPlan.exercises || workoutPlan.exercises.length === 0) { %>
+        <div class="card">
+          <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <p class="empty-state-title">Your trainer has not assigned a workout plan yet.</p>
+            <p class="empty-state-desc">Once your trainer assigns your routine, it will appear here grouped by day with target sets and reps.</p>
+          </div>
+        </div>
+      <% } else { %>
+        <!-- Weekly Routine Grid -->
+        <div class="workout-days-container">
+          <% daysOfWeek.forEach(day => { %>
+            <% const exercises = exercisesByDay[day] || []; %>
+            <% const isToday = (day === todayDayName); %>
+
+            <div class="workout-day-card <%= isToday ? 'today' : '' %>">
+              <div class="workout-day-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="workout-day-title"><%= day %></span>
+                  <% if (isToday) { %>
+                    <span class="badge badge-active" style="font-size: 0.7rem;">Today's Workout</span>
+                  <% } %>
+                </div>
+                <span class="workout-day-badge"><%= exercises.length %> Exercises</span>
+              </div>
+
+              <div class="workout-exercises-list">
+                <% if (exercises.length > 0) { %>
+                  <% exercises.forEach(ex => { %>
+                    <div class="exercise-item">
+                      <div class="exercise-header">
+                        <span class="exercise-name"><%= ex.exerciseName %></span>
+                        <span class="exercise-pill"><%= ex.sets %> × <%= ex.reps %></span>
+                      </div>
+                      <div class="exercise-meta">
+                        <span>Rest: <%= ex.restSeconds %>s</span>
+                      </div>
+                      <% if (ex.notes) { %>
+                        <div class="exercise-notes">Cue: <%= ex.notes %></div>
+                      <% } %>
+                    </div>
+                  <% }) %>
+                <% } else { %>
+                  <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem 0;">
+                    Rest Day
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </main>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
